@@ -1,0 +1,238 @@
+
+
+Table
+@EndUserText.label : &#39;Aquistation and Deposition&#39;
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zwm_aquisdeposit {
+key mandt : mandt not null;
+key matnr_ext : matnr_ext not null;
+key sernr : gernr not null;
+key acquisition_date : co_ltrmi not null;
+key counter : apb_lpd_counter not null;
+return_indicator : abap.char(1);
+return_acquis_date : abap.dats;
+maktx : maktx;
+@Semantics.quantity.unitOfMeasure : &#39;zwm_aquisdeposit.amein&#39;
+wemng : co_wemng;
+amein : co_aufme;
+sold_to : abap.char(3);
+caliber_or_gauge : abap.char(10);
+shipper_number : fpltr;
+shipped_date : abap.dats;
+ship_to_name : abap.char(50);
+ship_to_phone : abap.char(15);
+ship_to_address1 : abap.char(50);
+ship_to_address2 : abap.char(50);
+ship_to_address3 : abap.char(50);
+ship_to_address4 : abap.char(50);
+contract_number1 : abap.char(35);
+bwart : bwart;
+permit_of_exemption : abap.char(25);
+manuf_brand : abap.char(30);
+manuf_country : abap.char(30);
+model_number : abap.char(30);
+permit_of_exc_number : abap.char(10);
+state_of_license : abap.char(10);
+timestamp : tzntstmps;
+modif_timestamp : tzntstmps;
+created_by : uname;
+modified_by : uname;
+}
+Base CDS View
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: &#39;Aquisation and Deposit&#39;
+@Metadata.ignorePropagatedAnnotations: true
+@ObjectModel.usageType:{
+serviceQuality: #X,
+sizeCategory: #S,
+dataClass: #MIXED
+}
+define view entity ZI_SD_AQUI_DEP as select from zwm_aquisdeposit
+
+//association to parent zi_ses_parent as _ses_file on $projection.end_user =
+_ses_file.end_user
+{
+key cast( $session.user as uname) as end_user,
+cast( matnr_ext as abap.char(40)) as MatnrExt,
+sernr as Sernr,
+acquisition_date as AcquisitionDate,
+counter as Counter,
+// cast( $session.user as uname) as end_user,
+return_indicator as ReturnIndicator,
+return_acquis_date as ReturnAcquisDate,
+maktx as Maktx,
+@Semantics.quantity.unitOfMeasure: &#39;amein&#39;
+wemng as Wemng,
+amein as Amein,
+sold_to as SoldTo,
+caliber_or_gauge as CaliberOrGauge,
+shipper_number as ShipperNumber,
+shipped_date as ShippedDate,
+ship_to_name as ShipToName,
+ship_to_phone as ShipToPhone,
+ship_to_address1 as ShipToAddress1,
+ship_to_address2 as ShipToAddress2,
+ship_to_address3 as ShipToAddress3,
+ship_to_address4 as ShipToAddress4,
+contract_number1 as ContractNumber1,
+bwart as Bwart,
+permit_of_exemption as PermitOfExemption,
+manuf_brand as ManufBrand,
+manuf_country as ManufCountry,
+model_number as ModelNumber,
+permit_of_exc_number as PermitOfExcNumber,
+state_of_license as StateOfLicense,
+timestamp as Timestamp,
+modif_timestamp as ModifTimestamp,
+created_by as CreatedBy,
+modified_by as ModifiedBy
+// _ses_file
+}
+
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: &#39;Aquisation and Deposit Projection&#39;
+@UI.headerInfo:{
+typeName: &#39;Aquisition/Deposot&#39;,
+typeNamePlural: &#39;Aquisition/Deposits&#39;,
+typeImageUrl: &#39;sap-icon://building&#39;,
+title: {
+type: #STANDARD,
+value: &#39;Maktx&#39;
+},
+description.value: &#39;MatnrExt&#39;
+}
+
+Root View
+define root view entity ZC_SD_AQUI_DEP as select from ZI_SD_AQUI_DEP
+//composition [1] of zi_ses_parent as _ses_excel
+{
+@UI.facet: [{ id: &#39;MatnrExt&#39;,
+purpose: #STANDARD,
+type: #FIELDGROUP_REFERENCE,
+label: &#39;Material&#39;,
+position: 10,
+targetQualifier: &#39;SESDetails&#39;
+}]
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@UI.lineItem: [{ position: 10 , label: &#39;SES Number&#39;, invocationGrouping:
+#ISOLATED },
+{ type: #FOR_ACTION, dataAction: &#39;createSES&#39;, label: &#39;Process SES&#39; }]
+key end_user,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;External Long Material&#39;
+MatnrExt,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Serial Number&#39;
+Sernr,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Actual Delivery/Finish Date&#39;
+AcquisitionDate,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Counyter&#39;
+Counter,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Return Indicator&#39;
+ReturnIndicator,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Acquisition Date&#39;
+ReturnAcquisDate,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Material Discription&#39;
+Maktx,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Quantity of goods received&#39;
+Wemng,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Unit of Measure&#39;
+Amein,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Sold To&#39;
+SoldTo,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Caliber or Gauge&#39;
+CaliberOrGauge,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Item for Billing/Invoice Plan&#39;
+ShipperNumber,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Shipped Date&#39;
+ShippedDate,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Ship to Name&#39;
+
+ShipToName,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Ship to Phone&#39;
+ShipToPhone,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Ship To Address1&#39;
+ShipToAddress1,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Ship To Address2&#39;
+ShipToAddress2,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Ship To Address3&#39;
+ShipToAddress3,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Ship To Address4&#39;
+ShipToAddress4,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;First Contact Number&#39;
+ContractNumber1,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Movement Type&#39;
+Bwart,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Permit of Exemption&#39;
+PermitOfExemption,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Brand of Manufacture&#39;
+ManufBrand,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Country of Manufacture&#39;
+ManufCountry,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Model&#39;
+ModelNumber,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Permit of Excemtion Number&#39;
+PermitOfExcNumber,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;State Department Export License&#39;
+StateOfLicense,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Created UTC Timestamp in Short Form&#39;
+Timestamp,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Modified UTC Timestamp in Short Form&#39;
+ModifTimestamp,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Created User ID&#39;
+CreatedBy,
+@UI.fieldGroup: [{ qualifier: &#39;SESDetails&#39; }]
+@EndUserText.label: &#39;Modified User ID&#39;
+ModifiedBy
+// _ses_excel
+}
+Behaviour Definition
+managed implementation in class zpts_c_i_wm_aqui_dep unique;
+
+strict;
+define behavior for ZC_SD_AQUI_DEP //alias &lt;alias_name&gt;
+persistent table ZWM_AQUISDEPOSIT
+lock master
+authorization master ( instance )
+//etag master &lt;field_name&gt;
+{
+create;
+update;
+delete;
+}
+Service Definition
+@EndUserText.label: &#39;Service Definition Acquisitioin&#39;
+define service ZC_SD_AQUI_DEP_SD {
+expose ZC_SD_AQUI_DEP as Acqusition;
