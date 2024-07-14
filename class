@@ -1,0 +1,95 @@
+CLASS lhc_ZC_SD_AQUI_DEP DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+
+    METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
+      IMPORTING keys REQUEST requested_authorizations FOR zc_sd_aqui_dep RESULT result.
+
+    METHODS create FOR MODIFY
+      IMPORTING entities FOR CREATE zc_sd_aqui_dep.
+
+    METHODS update FOR MODIFY
+      IMPORTING entities FOR UPDATE zc_sd_aqui_dep.
+
+    METHODS delete FOR MODIFY
+      IMPORTING keys FOR DELETE zc_sd_aqui_dep.
+
+    METHODS read FOR READ
+      IMPORTING keys FOR READ zc_sd_aqui_dep RESULT result.
+
+    METHODS lock FOR LOCK
+      IMPORTING keys FOR LOCK zc_sd_aqui_dep.
+
+ENDCLASS.
+
+CLASS lhc_ZC_SD_AQUI_DEP IMPLEMENTATION.
+
+  METHOD get_instance_authorizations.
+  ENDMETHOD.
+
+  METHOD create.
+  data lt_aqui TYPE STANDARD TABLE OF ZWM_AQUISDEPOSIT.
+
+  lt_aqui = VALUE #( for wa in entities (  MATNR_EXT = wa-MatnrExt
+SERNR = wa-Sernr
+ACQUISITION_DATE = wa-AcquisitionDate
+COUNTER = wa-Counter
+RETURN_INDICATOR = wa-ReturnIndicator
+RETURN_ACQUIS_DATE = wa-ReturnAcquisDate
+MAKTX = wa-Maktx
+WEMNG = wa-Wemng
+AMEIN = wa-amein
+SOLD_TO = wa-SoldTo
+CALIBER_OR_GAUGE = wa-CaliberOrGauge
+SHIPPER_NUMBER = wa-ShipperNumber ) ).
+
+MODIFY zwm_aquisdeposit FROM TABLE lt_aqui.
+
+  ENDMETHOD.
+
+  METHOD update.
+  ENDMETHOD.
+
+  METHOD delete.
+  ENDMETHOD.
+
+  METHOD read.
+  ENDMETHOD.
+
+  METHOD lock.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lsc_ZC_SD_AQUI_DEP DEFINITION INHERITING FROM cl_abap_behavior_saver.
+  PROTECTED SECTION.
+
+    METHODS finalize REDEFINITION.
+
+    METHODS check_before_save REDEFINITION.
+
+    METHODS save REDEFINITION.
+
+    METHODS cleanup REDEFINITION.
+
+    METHODS cleanup_finalize REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_ZC_SD_AQUI_DEP IMPLEMENTATION.
+
+  METHOD finalize.
+  ENDMETHOD.
+
+  METHOD check_before_save.
+  ENDMETHOD.
+
+  METHOD save.
+  ENDMETHOD.
+
+  METHOD cleanup.
+  ENDMETHOD.
+
+  METHOD cleanup_finalize.
+  ENDMETHOD.
+
+ENDCLASS.
