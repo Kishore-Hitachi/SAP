@@ -1,0 +1,281 @@
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Aquisation and Deposit Projection'
+@UI.headerInfo:{
+ typeName: 'Aquisition/Deposot',
+ typeNamePlural: 'Aquisition/Deposits',
+ typeImageUrl: 'sap-icon://building',
+ title: {
+   type: #STANDARD,
+   value: 'MaterialName'
+ },
+   
+ description.value: 'MatnrExt'
+}
+define root view entity ZC_SD_AQUI_DEP as select from ZI_SD_AQUI_DEP
+//composition [1] of zi_ses_parent as _ses_excel
+{
+ 
+@UI.facet: [{ id: 'MatnrExt',
+       purpose: #STANDARD,
+       type: #FIELDGROUP_REFERENCE,
+       label: 'Material',
+       position: 10,
+       targetQualifier: 'SESDetails'
+ 
+     }]
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+     @EndUserText.label: 'External Long Material'
+     @UI.selectionField: [{ position: 10 }]
+     @UI.lineItem: [{
+        position: 10
+      } ]
+//      @UI.identification:[{position: 10}]
+     @Consumption.valueHelpDefinition: [{entity:{element: 'Material', name: 'I_MaterialText' },
+ 
+additionalBinding: [{ localElement: 'MaterialName', element: 'MaterialName', usage: #FILTER_AND_RESULT }] }]
+  key  MatnrExt,
+    @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Serial Number'
+   @UI.lineItem: [{
+        position: 30
+      }]
+     @UI.identification:[{position: 30}]
+     @UI.selectionField: [{ position: 20 }]
+  key  Sernr,
+    @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Actual Delivery/Finish Date'
+   @UI.lineItem: [{
+        position: 40
+      }]
+     @UI.identification:[{position: 40}]
+     @UI.selectionField: [{ position: 30 }]
+  key  AcquisitionDate,
+    @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Counter'
+   @UI.lineItem: [{
+        position: 50
+      }]
+     @UI.identification:[{position: 50}]
+  key  Counter,
+@UI.lineItem: [{
+        position: 20
+      }]
+     @UI.identification:[{position: 20}]
+    @UI.fieldGroup: [{ qualifier: 'SESDetails' }]
+   _Text.MaterialName,
+  @UI.lineItem: [{
+        position: 60
+      }]
+     @UI.identification:[{position: 60}]
+    @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Return Indicator'
+   ReturnIndicator,
+   @UI.lineItem: [{
+        position: 70
+      }]
+     @UI.identification:[{position: 70}]
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @UI.selectionField: [{ position: 40 }]
+   @EndUserText.label: 'Acquisition Date'
+   ReturnAcquisDate,
+   @UI.lineItem: [{
+        position: 80
+      }]
+     @UI.identification:[{position: 80}]
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Quantity of goods received'
+   Wemng,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Unit of Measure'
+   Amein,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Sold To'
+   SoldTo,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Caliber or Gauge'
+   CaliberOrGauge,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Item for Billing/Invoice Plan'
+   ShipperNumber,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Shipped Date'
+   @UI.selectionField: [{ position: 50 }]
+   ShippedDate,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Ship to Name'
+   ShipToName,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Ship to Phone'
+   ShipToPhone,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Ship To Address1'
+   ShipToAddress1,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Ship To Address2'
+   ShipToAddress2,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Ship To Address3'
+   ShipToAddress3,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Ship To Address4'
+   ShipToAddress4,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'First Contact Number'
+   ContractNumber1,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Movement Type'
+   Bwart,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Permit of Exemption'
+   PermitOfExemption,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Brand of Manufacture'
+   ManufBrand,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Country of Manufacture'
+   ManufCountry,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Model'
+   ModelNumber,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Permit of Excemtion Number'
+   PermitOfExcNumber,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'State Department Export License'
+   StateOfLicense,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Created UTC Timestamp in Short Form'
+   Timestamp,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Modified UTC Timestamp in Short Form'
+   ModifTimestamp,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Created User ID'
+   CreatedBy,
+   @UI.fieldGroup: [{ qualifier: 'SESDetails' }]  
+   @EndUserText.label: 'Modified User ID'
+   ModifiedBy
+   //    _ses_excel  
+}
+ 
+Class
+CLASS lhc_ZC_SD_AQUI_DEP DEFINITION INHERITING FROM cl_abap_behavior_handler.
+ PUBLIC SECTION.
+ data  go_instance TYPE REF TO zcl_acqui_details.
+ PRIVATE SECTION.
+ 
+   METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
+     IMPORTING keys REQUEST requested_authorizations FOR zc_sd_aqui_dep RESULT result.
+ 
+   METHODS create FOR MODIFY
+     IMPORTING entities FOR CREATE zc_sd_aqui_dep.
+ 
+   METHODS update FOR MODIFY
+     IMPORTING entities FOR UPDATE zc_sd_aqui_dep.
+ 
+   METHODS delete FOR MODIFY
+     IMPORTING keys FOR DELETE zc_sd_aqui_dep.
+ 
+   METHODS read FOR READ
+     IMPORTING keys FOR READ zc_sd_aqui_dep RESULT result.
+ 
+   METHODS lock FOR LOCK
+     IMPORTING keys FOR LOCK zc_sd_aqui_dep.
+ 
+ENDCLASS.
+ 
+CLASS lhc_ZC_SD_AQUI_DEP IMPLEMENTATION.
+ 
+ METHOD get_instance_authorizations.
+ ENDMETHOD.
+ 
+ METHOD create.
+ zcl_acqui_details=>get_instance( CHANGING lo_object = go_instance ).
+ go_instance->create( EXPORTING it_entity = entities ).
+ 
+ ENDMETHOD.
+ 
+ METHOD update.
+ 
+ zcl_acqui_details=>get_instance( CHANGING lo_object = go_instance ).
+ go_instance->update( EXPORTING it_entity = entities ).
+ 
+ ENDMETHOD.
+ 
+ METHOD delete.
+ loop at keys ASSIGNING FIELD-SYMBOL(<fs_key>).
+ delete FROM zwm_aquisdeposit WHERE matnr_ext = <fs_key>-MatnrExt
+                               AND  acquisition_date = <fs_key>-AcquisitionDate
+                               and  sernr = <fs_key>-sernr
+                               and  counter = <fs_key>-counter .
+ endloop.
+ ENDMETHOD.
+ 
+ METHOD read.
+ ENDMETHOD.
+ 
+ METHOD lock.
+ ENDMETHOD.
+ 
+ENDCLASS.
+ 
+CLASS lsc_ZC_SD_AQUI_DEP DEFINITION INHERITING FROM cl_abap_behavior_saver.
+PUBLIC SECTION.
+data  go_instance TYPE REF TO zcl_acqui_details.
+ PROTECTED SECTION.
+ 
+   METHODS finalize REDEFINITION.
+ 
+   METHODS check_before_save REDEFINITION.
+ 
+   METHODS save REDEFINITION.
+ 
+   METHODS cleanup REDEFINITION.
+ 
+   METHODS cleanup_finalize REDEFINITION.
+ 
+ENDCLASS.
+ 
+CLASS lsc_ZC_SD_AQUI_DEP IMPLEMENTATION.
+ 
+ METHOD finalize.
+ ENDMETHOD.
+ 
+ METHOD check_before_save.
+ zcl_acqui_details=>get_instance( CHANGING lo_object = go_instance ).
+ go_instance->validate( IMPORTING et_msg = data(lt_msg) ).
+ 
+ reported-zc_sd_aqui_dep = VALUE #( for wa in lt_msg ( %create = flag_error
+                                                       AcquisitionDate = wa-ACQUISITION_DATE
+                                                       MatnrExt = wa-matnr_ext
+                                                       sernr = wa-sernr
+                                                        %msg = new_message( id = wa-msg-id
+                                                                                     number = wa-msg-number
+                                                                                     severity = COND #( WHEN wa-msg-type = 'W'
+                                                                                                        THEN if_abap_behv_message=>severity-warning
+                                                                                                        WHEN wa-msg-type = 'E'
+                                                                                                        THEN if_abap_behv_message=>severity-error
+                                                                                                        WHEN wa-msg-type = 'S'
+                                                                                                        THEN if_abap_behv_message=>severity-success )
+*                                                                                  severity = if_abap_behv_message=>severity-success
+                                                                                     v1 = wa-msg-message_v1
+                                                                                     v2 = wa-msg-message_v2
+                                                                                     v3 = wa-msg-message_v3
+                                                                                     v4 = wa-msg-message_v4 ) ) ).
+ ENDMETHOD.
+ 
+ METHOD save.
+ zcl_acqui_details=>get_instance( CHANGING lo_object = go_instance ).
+ if go_instance->gt_table is not INITIAL.
+ go_instance->save(  ).
+ endif.
+ ENDMETHOD.
+ 
+ METHOD cleanup.
+ ENDMETHOD.
+ 
+ METHOD cleanup_finalize.
+ ENDMETHOD.
+ 
+ENDCLASS.
+ 
