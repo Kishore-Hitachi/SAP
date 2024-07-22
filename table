@@ -1,0 +1,273 @@
+class ZCL_ACQUI_DETAILS definition
+ public
+ final
+ create public .
+ 
+public section.
+ 
+ types:
+   BEGIN OF gty_msg,
+        MATNR_EXT TYPE MATNR_EXT,
+        SERNR TYPE GERNR,
+        ACQUISITION_DATE TYPE CO_LTRMI,
+        msg TYPE bapiret2,
+        END OF gty_msg .
+ types:
+   gtt_msg TYPE STANDARD TABLE OF gty_msg .
+ types:
+   GTY_TABLE TYPE STANDARD TABLE OF ZWM_AQUISDEPOSIT .
+ types:
+   GTY_ENTITY TYPE TABLE FOR CREATE ZC_SD_AQUI_DEP .
+ types:
+   GTY_ENTITY_u TYPE TABLE FOR UPDATE ZC_SD_AQUI_DEP .
+ types:
+   GTY_ENTITY_d TYPE TABLE FOR DELETE ZC_SD_AQUI_DEP .
+ 
+ data GT_TABLE type GTY_TABLE .
+ 
+ class-methods GET_INSTANCE
+   changing
+     !LO_OBJECT type ref to ZCL_ACQUI_DETAILS .
+ methods CREATE
+   importing
+     !IT_ENTITY type GTY_ENTITY .
+ methods VALIDATE
+   exporting
+     !ET_MSG type GTT_MSG .
+ methods SAVE .
+ methods UPDATE
+   importing
+     !IT_ENTITY type GTY_ENTITY_U .
+protected section.
+private section.
+ 
+ class-data GO_INSTANCE type ref to ZCL_ACQUI_DETAILS .
+ENDCLASS.
+ 
+ 
+ 
+CLASS ZCL_ACQUI_DETAILS IMPLEMENTATION.
+ 
+ 
+ method CREATE.
+data(lv_datetime) = sy-datum && sy-uzeit.
+ 
+select a~matnr_ext, a~sernr, a~ACQUISITION_DATE, max( a~counter ) as counter FROM ZWM_AQUISDEPOSIT as a INNER JOIN @it_entity as b
+                                                                                                       on a~matnr_ext = b~MatnrExt
+                                                                                                       and a~sernr = b~Sernr
+                                                                                                       and a~acquisition_date = b~AcquisitionDate
+                                                                      GROUP BY a~matnr_ext, a~sernr, a~acquisition_date into TABLE @data(lt_acc).
+ 
+ 
+     gt_table = VALUE #( for wa in IT_ENTITY (  MATNR_EXT = wa-MatnrExt
+SERNR = wa-Sernr
+ACQUISITION_DATE = wa-AcquisitionDate
+COUNTER = VALUE #( lt_acc[ matnr_ext = wa-MatnrExt sernr = wa-Sernr acquisition_date = wa-AcquisitionDate ]-counter OPTIONAL ) + 1
+RETURN_INDICATOR = wa-ReturnIndicator
+RETURN_ACQUIS_DATE = wa-ReturnAcquisDate
+*MAKTX = wa-Maktx
+WEMNG = wa-Wemng
+AMEIN = wa-amein
+SOLD_TO = wa-SoldTo
+CALIBER_OR_GAUGE = wa-CaliberOrGauge
+SHIPPER_NUMBER = wa-ShipperNumber
+SHIPPED_DATE = wa-ShippedDate
+SHIP_TO_NAME = wa-ShipToName
+SHIP_TO_PHONE = wa-ShipToName
+SHIP_TO_ADDRESS1 = wa-ShipToAddress1
+SHIP_TO_ADDRESS2 = wa-ShipToAddress2
+SHIP_TO_ADDRESS3 = wa-ShipToAddress3
+SHIP_TO_ADDRESS4 = wa-ShipToAddress4
+CONTRACT_NUMBER1 = wa-ContractNumber1
+BWART = wa-Bwart
+PERMIT_OF_EXEMPTION = wa-PermitOfExemption
+MANUF_BRAND = cond #( WHEN wa-ManufBrand is INITIAL
+                     THEN 'LOCKHEED MARTIN'
+                     ELSE wa-ManufBrand )
+MANUF_COUNTRY = cond #( WHEN wa-ManufCountry is INITIAL
+                       THEN 'UNITED STATES'
+                       ELSE wa-ManufCountry )
+MODEL_NUMBER = cond #( WHEN wa-ModelNumber is INITIAL
+                      THEN 'NA'
+                      ELSE wa-ModelNumber )
+PERMIT_OF_EXC_NUMBER = wa-PermitOfExcNumber
+STATE_OF_LICENSE = wa-StateOfLicense
+TIMESTAMP = lv_datetime
+MODIF_TIMESTAMP = lv_datetime
+CREATED_BY = sy-uname
+MODIFIED_BY = sy-uname ) ).
+ 
+ endmethod.
+ 
+ 
+ METHOD get_instance.
+   IF go_instance IS NOT BOUND.
+     go_instance = NEW #( ).
+     lo_object = go_instance.
+   ELSE.
+     lo_object = go_instance.
+   ENDIF.
+ ENDMETHOD.
+ 
+ 
+ method SAVE.
+   modify ZWM_AQUISDEPOSIT FROM TABLE gt_table.
+ endmethod.
+ 
+ 
+method UPDATE.
+ 
+data(lv_datetime) = sy-datum && sy-uzeit.
+ 
+select a~* from ZWM_AQUISDEPOSIT as a INNER JOIN @it_entity as b
+                                 ON a~matnr_ext = b~matnrext
+                                 and a~sernr = b~sernr
+                                 and a~counter = b~counter INTO TABLE @DATA(lt_data).
+ 
+loop at it_entity ASSIGNING FIELD-SYMBOL(<fs_entity>).
+ data(ls_data) = VALUE #( lt_data[ matnr_ext = <fs_entity>-%key-matnrext
+                       sernr = <fs_entity>-%key-sernr
+                       ACQUISITION_DATE = <fs_entity>-%key-AcquisitionDate
+                       COUNTER = <fs_entity>-%key-counter ] OPTIONAL ).
+ 
+ append INITIAL LINE TO gt_table ASSIGNING FIELD-SYMBOL(<fs_table>).
+ <fs_table> = VALUE #( matnr_ext = <fs_entity>-%key-matnrext
+                       sernr = <fs_entity>-%key-sernr
+                       ACQUISITION_DATE = <fs_entity>-%key-AcquisitionDate
+                       COUNTER = <fs_entity>-%key-counter
+                       RETURN_INDICATOR = COND #( WHEN <fs_entity>-%control-returnindicator is NOT INITIAL
+                           THEN <fs_entity>-returnindicator
+                           else ls_data-RETURN_INDICATOR
+                           )
+                       RETURN_ACQUIS_DATE = COND #( WHEN <fs_entity>-%control-RETURNACQUISDATE is NOT INITIAL
+                           THEN <fs_entity>-RETURNACQUISDATE
+                           else ls_data-RETURN_ACQUIS_DATE
+                           )
+*                            maktx = COND #( WHEN <fs_entity>-%control-maktx is NOT INITIAL
+*                            THEN <fs_entity>-maktx
+*                            else ls_data-maktx )
+                           wemng = COND #( WHEN <fs_entity>-%control-wemng is NOT INITIAL
+                           THEN <fs_entity>-wemng
+                           else ls_data-wemng )
+                           amein = COND #( WHEN <fs_entity>-%control-amein is NOT INITIAL
+                           THEN <fs_entity>-amein
+                           else ls_data-amein )
+                           sold_to = COND #( WHEN <fs_entity>-%control-soldto is NOT INITIAL
+                           THEN <fs_entity>-soldto
+                           else ls_data-sold_to )
+                           CALIBER_OR_GAUGE = COND #( WHEN <fs_entity>-%control-CALIBERORGAUGE is NOT INITIAL
+                           THEN <fs_entity>-CALIBERORGAUGE
+                           else ls_data-CALIBER_OR_GAUGE )
+                           SHIPPER_NUMBER = COND #( WHEN <fs_entity>-%control-SHIPPERNUMBER is NOT INITIAL
+                           THEN <fs_entity>-SHIPPERNUMBER
+                           else ls_data-SHIPPER_NUMBER )
+                           SHIPPED_DATE = COND #( WHEN <fs_entity>-%control-SHIPPEDDATE is NOT INITIAL
+                           THEN <fs_entity>-SHIPPEDDATE
+                           else ls_data-SHIPPED_DATE )
+                           SHIP_to_name = COND #( WHEN <fs_entity>-%control-SHIPtoname is NOT INITIAL
+                           THEN <fs_entity>-SHIPtoname
+                           else ls_data-SHIP_to_name )
+ 
+                           SHIP_to_phone = COND #( WHEN <fs_entity>-%control-SHIPtophone is NOT INITIAL
+                           THEN <fs_entity>-SHIPtophone
+                           else ls_data-SHIP_to_phone )
+ 
+                           SHIP_to_address1 = COND #( WHEN <fs_entity>-%control-SHIPtoaddress1 is NOT INITIAL
+                           THEN <fs_entity>-SHIPtoaddress1
+                           else ls_data-SHIP_to_address1 )
+ 
+                            SHIP_to_address2 = COND #( WHEN <fs_entity>-%control-SHIPtoaddress2 is NOT INITIAL
+                           THEN <fs_entity>-SHIPtoaddress2
+                           else ls_data-SHIP_to_address2 )
+ 
+                            SHIP_to_address3 = COND #( WHEN <fs_entity>-%control-SHIPtoaddress3 is NOT INITIAL
+                           THEN <fs_entity>-SHIPtoaddress3
+                           else ls_data-SHIP_to_address3 )
+ 
+                            SHIP_to_address4 = COND #( WHEN <fs_entity>-%control-SHIPtoaddress4 is NOT INITIAL
+                           THEN <fs_entity>-SHIPtoaddress4
+                           else ls_data-SHIP_to_address4 )
+ 
+                            CONTRACT_NUMBER1 = COND #( WHEN <fs_entity>-%control-CONTRACTNUMBER1 is NOT INITIAL
+                           THEN <fs_entity>-CONTRACTNUMBER1
+                           else ls_data-CONTRACT_NUMBER1 )
+ 
+                           bwart = COND #( WHEN <fs_entity>-%control-bwart is NOT INITIAL
+                           THEN <fs_entity>-bwart
+                           else ls_data-bwart )
+ 
+                           PERMIT_OF_EXEMPTION = COND #( WHEN <fs_entity>-%control-PERMITOFEXEMPTION is NOT INITIAL
+                           THEN <fs_entity>-PERMITOFEXEMPTION
+                           else ls_data-PERMIT_OF_EXEMPTION )
+ 
+                           MANUF_BRAND = COND #( WHEN <fs_entity>-%control-MANUFBRAND is NOT INITIAL
+                           THEN <fs_entity>-MANUFBRAND
+                           else ls_data-MANUF_BRAND )
+ 
+                           MANUF_COUNTRY = COND #( WHEN <fs_entity>-%control-MANUFCOUNTRY is NOT INITIAL
+                           THEN <fs_entity>-MANUFCOUNTRY
+                           else ls_data-MANUF_COUNTRY )
+ 
+                           MODEL_NUMBER = COND #( WHEN <fs_entity>-%control-MODELNUMBER is NOT INITIAL
+                           THEN <fs_entity>-MODELNUMBER
+                           else ls_data-MODEL_NUMBER )
+ 
+                           PERMIT_OF_EXC_NUMBER = COND #( WHEN <fs_entity>-%control-PERMITOFEXCNUMBER is NOT INITIAL
+                           THEN <fs_entity>-PERMITOFEXCNUMBER
+                           else ls_data-PERMIT_OF_EXC_NUMBER )
+ 
+                           STATE_OF_LICENSE = COND #( WHEN <fs_entity>-%control-STATEOFLICENSE is NOT INITIAL
+                           THEN <fs_entity>-STATEOFLICENSE
+                           else ls_data-STATE_OF_LICENSE )
+ 
+                           TIMESTAMP = ls_data-timestamp
+                           CREATED_BY = ls_data-CREATED_BY
+                           MODIF_TIMESTAMP = lv_datetime
+                           MODIFIED_BY = sy-uname
+ 
+                            ).
+ endloop.
+*    gt_table = VALUE #( FOR wa in it_entity ( gt_table = VALUE #( for wa in IT_ENTITY (  MATNR_EXT = wa-%key-matnrext
+*SERNR = wa-%key-sernr
+*ACQUISITION_DATE = wa-%key-AcquisitionDate
+*COUNTER = wa-%key-counter
+*RETURN_INDICATOR = COND #( WHEN wa-%control-returnindicator is NOT INITIAL
+*                            THEN wa-returnindicator
+*                            else
+*RETURN_ACQUIS_DATE = wa-ReturnAcquisDate
+*MAKTX = wa-Maktx
+*WEMNG = wa-Wemng
+*AMEIN = wa-amein
+*SOLD_TO = wa-SoldTo
+*CALIBER_OR_GAUGE = wa-CaliberOrGauge
+*SHIPPER_NUMBER = wa-ShipperNumber
+*SHIPPED_DATE = wa-ShippedDate
+*SHIP_TO_NAME = wa-ShipToName
+*SHIP_TO_PHONE = wa-ShipToName
+*SHIP_TO_ADDRESS1 = wa-ShipToAddress1
+*SHIP_TO_ADDRESS2 = wa-ShipToAddress2
+*SHIP_TO_ADDRESS3 = wa-ShipToAddress3
+*SHIP_TO_ADDRESS4 = wa-ShipToAddress4
+*CONTRACT_NUMBER1 = wa-ContractNumber1
+*BWART = wa-Bwart
+*PERMIT_OF_EXEMPTION = wa-PermitOfExemption
+*MANUF_BRAND = wa-ManufBrand
+*MANUF_COUNTRY = wa-ManufCountry
+*MODEL_NUMBER = wa-ModelNumber
+*PERMIT_OF_EXC_NUMBER = wa-PermitOfExcNumber
+*STATE_OF_LICENSE = wa-StateOfLicense
+*TIMESTAMP = sy-uzeit
+*MODIF_TIMESTAMP = sy-uzeit
+*CREATED_BY = sy-uname
+*MODIFIED_BY = sy-uname ) ). )
+ 
+ endmethod.
+ 
+ 
+ method VALIDATE.
+ 
+ 
+ 
+ endmethod.
+ENDCLASS.
+ 
