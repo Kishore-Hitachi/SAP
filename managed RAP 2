@@ -1,0 +1,84 @@
+CLASS lhc_AauiDep DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+
+    METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
+      IMPORTING REQUEST requested_authorizations FOR AauiDep RESULT result.
+    METHODS count FOR DETERMINE ON MODIFY
+      IMPORTING keys FOR AauiDep~count.
+
+ENDCLASS.
+
+CLASS lhc_AauiDep IMPLEMENTATION.
+
+  METHOD get_global_authorizations.
+  ENDMETHOD.
+
+  METHOD count.
+  READ ENTITIES OF ZC_SD_AQUI_DEP IN LOCAL MODE
+       ENTITY AauiDep
+       ALL FIELDS WITH CORRESPONDING #( keys )
+       RESULT DATA(aqui)
+       .
+         select Valuation~ClfnObjectID from I_ClfnObjectCharcValueBasic as Valuation
+    inner join P_ClfnObjectHeader as ObjectHeader
+      on  Valuation~ClassType      = ObjectHeader~ClassType
+      and Valuation~ClfnObjectType = ObjectHeader~ClfnObjectType
+      and Valuation~ClfnObjectID   = ObjectHeader~objekp
+    INNER JOIN I_ClfnCharacteristic as _Characteristic
+       on Valuation~CharcInternalID    = _Characteristic~CharcInternalID
+     and Valuation~ValidityStartDate <= _Characteristic~ValidityEndDate
+     and Valuation~ValidityEndDate   >= _Characteristic~ValidityStartDate
+    WHERE _characteristic~characteristic = 'CHA_943452_PRN' into TABLE @DATA(lt_val).
+
+       loop at aqui ASSIGNING FIELD-SYMBOL(<fs_table>).
+     if not line_exists( lt_val[ ClfnObjectID = <fs_table>-MatnrExt ] ).
+    APPEND VALUE #( %tky        = <fs_table>-%tky
+                    %state_area = 'MatnrExt' )
+                     TO reported-aauidep.
+
+      APPEND VALUE #( %tky             = <fs_table>-%tky
+                      %state_area      = 'MatnrExt'
+                      %msg             = new_message_with_text(
+                      severity = if_abap_behv_message=>severity-error
+                      text     = 'Material Not Exists' )
+                      %element-MatnrExt = if_abap_behv=>mk-on )
+                      TO reported-aauidep.
+                      endif.
+                      ENDLOOP.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lsc_ZC_SD_AQUI_DEP DEFINITION INHERITING FROM cl_abap_behavior_saver.
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+    METHODS cleanup_finalize REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_ZC_SD_AQUI_DEP IMPLEMENTATION.
+
+  METHOD save_modified.
+  DATA(lo_ref) = NEW ZCL_ACQUI_DETAILS(  ).
+  if create-aauidep is NOT INITIAL.
+  lo_ref->create( EXPORTING it_entity = VALUE #( for wa in create-aauidep ( CORRESPONDING #( wa ) ) ) ).
+   lo_ref->save(  ).
+  ELSEIF update-aauidep  is NOT INITIAL.
+  lo_ref->update( EXPORTING it_entity = VALUE #( for wa in update-aauidep ( CORRESPONDING #( wa ) ) ) ).
+   lo_ref->save(  ).
+  elseif delete-aauidep is NOT INITIAL.
+  loop at delete-aauidep ASSIGNING FIELD-SYMBOL(<fs_del>).
+   delete FROM zwm_aquisdeposit WHERE acquisition_date = <fs_del>-AcquisitionDate
+                                AND   matnr_ext = <fs_del>-MatnrExt
+                                AND   sernr = <fs_del>-Sernr
+                                and   counter = <fs_del>-Counter .
+                                ENDLOOP.
+  endif.
+  ENDMETHOD.
+
+  METHOD cleanup_finalize.
+  ENDMETHOD.
+
+ENDCLASS.
