@@ -1,0 +1,74 @@
+managed implementation in class zbp_c_sd_aqui_dep unique;
+strict;
+with draft;
+
+
+define behavior for ZC_SD_AQUI_DEP alias AauiDep
+//persistent table zwm_aquisdeposit
+draft table zdt_aquisdeposit with unmanaged save
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
+authorization master ( global )
+{
+field ( mandatory : create )
+MatnrExt,
+Sernr,
+AcquisitionDate;
+
+field( readonly )
+Counter,
+ModifTimestamp,
+ModifiedBy,
+Timestamp,
+CreatedBy;
+
+field( readonly : update)
+MatnrExt,
+Sernr,
+AcquisitionDate;
+
+  create;
+  update;
+  delete;
+
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+  determination count on modify { create; field AcquisitionDate, MatnrExt, Sernr; }
+  mapping for zwm_aquisdeposit
+  { AcquisitionDate = acquisition_date;
+    Amein = amein;
+    Bwart = bwart;
+    CaliberOrGauge = caliber_or_gauge;
+    ContractNumber1 = contract_number1;
+    Counter = counter;
+    CreatedBy = created_by;
+    LastChangedAt = last_changed_at;
+    LocalLastChangedAt = local_last_changed_at;
+    ManufBrand = manuf_brand;
+    ManufCountry = manuf_country;
+    MatnrExt = matnr_ext;
+    ModelNumber = model_number;
+    ModifTimestamp = modif_timestamp;
+    ModifiedBy = modified_by;
+    PermitOfExcNumber = permit_of_exc_number;
+    PermitOfExemption = permit_of_exemption;
+    ReturnAcquisDate = return_acquis_date;
+    ReturnIndicator = return_indicator;
+    Sernr = sernr;
+    ShipToAddress1 = ship_to_address1;
+    ShipToAddress2 = ship_to_address2;
+    ShipToAddress3 = ship_to_address3;
+    ShipToAddress4 = ship_to_address4;
+    ShipToName = ship_to_name;
+    ShipToPhone = ship_to_phone;
+    ShippedDate = shipped_date;
+    ShipperNumber = shipper_number;
+    SoldTo = sold_to;
+    StateOfLicense = state_of_license;
+    Timestamp = timestamp;
+    Wemng = wemng;
+    }
+}
